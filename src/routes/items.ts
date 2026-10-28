@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { eq, and, ilike, or, asc, desc, SQL } from 'drizzle-orm';
-import { db } from '../db';
-import { items } from '../db/schema';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
-import { CreateItemSchema, UpdateItemSchema, QueryItemsSchema } from '../validators/schemas';
+import { db } from '../db/index.js';
+import { items } from '../db/schema.js';
+import { authenticateToken, AuthRequest } from '../middleware/auth.js';
+import { CreateItemSchema, UpdateItemSchema, QueryItemsSchema } from '../validators/schemas.js';
 
 const router = Router();
 

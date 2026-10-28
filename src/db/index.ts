@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import { users, items } from './schema';
+import { users, items } from './schema.js';
 
 // Initialize the database connection using Neon serverless driver
 const databaseUrl = process.env.DATABASE_URL;

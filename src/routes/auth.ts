@@ -2,9 +2,9 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { eq } from 'drizzle-orm';
-import { db } from '../db';
-import { users } from '../db/schema';
-import { RegisterSchema, LoginSchema } from '../validators/schemas';
+import { db } from '../db/index.js';
+import { users } from '../db/schema.js';
+import { RegisterSchema, LoginSchema } from '../validators/schemas.js';
 
 const router = Router();
 
