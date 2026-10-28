@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, and, ilike, or, asc, desc } from 'drizzle-orm';
+import { eq, and, ilike, or, asc, desc, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { items } from '../db/schema';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
@@ -21,35 +21,33 @@ router.get('/', async (req: AuthRequest, res) => {
     const { search, searchType, type, category, sort } = parsed.data;
     const userId = req.userId!;
 
-    let conditions = eq(items.userId, userId);
+    const conditions: SQL[] = [eq(items.userId, userId)];
 
     // Apply search filter
     if (search) {
       const searchPattern = `%${search}%`;
       if (searchType === 'all') {
-        conditions = and(
-          conditions,
-          or(
-            ilike(items.name, searchPattern),
-            ilike(items.location, searchPattern),
-            ilike(items.notes, searchPattern)
-          )
+        const searchCond = or(
+          ilike(items.name, searchPattern),
+          ilike(items.location, searchPattern),
+          ilike(items.notes, searchPattern)
         );
+        if (searchCond) conditions.push(searchCond);
       } else if (searchType === 'name') {
-        conditions = and(conditions, ilike(items.name, searchPattern));
-      } else if (searchType === 'location') {
-        conditions = and(conditions, ilike(items.location, searchPattern));
+        conditions.push(ilike(items.name, searchPattern));
+      } else {
+        conditions.push(ilike(items.location, searchPattern));
       }
     }
 
     // Apply type filter
     if (type) {
-      conditions = and(conditions, eq(items.type, type));
+      conditions.push(eq(items.type, type));
     }
 
     // Apply category filter
     if (category) {
-      conditions = and(conditions, eq(items.category, category));
+      conditions.push(eq(items.category, category));
     }
 
     // Apply sorting
@@ -57,7 +55,7 @@ router.get('/', async (req: AuthRequest, res) => {
     const sortFn = direction === 'asc' ? asc : desc;
     const sortColumn = field === 'dateAdded' ? items.dateAdded : items.name;
 
-    const result = await db.select().from(items).where(conditions).orderBy(sortFn(sortColumn));
+    const result = await db.select().from(items).where(and(...conditions)).orderBy(sortFn(sortColumn));
 
     res.json(result);
   } catch (error) {
@@ -69,7 +67,7 @@ router.get('/', async (req: AuthRequest, res) => {
 // Get a single item by ID
 router.get('/:id', async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const userId = req.userId!;
 
     const result = await db
@@ -123,7 +121,7 @@ router.post('/', async (req: AuthRequest, res) => {
 // Update an item
 router.put('/:id', async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const userId = req.userId!;
 
     const parsed = UpdateItemSchema.safeParse(req.body);
@@ -164,7 +162,7 @@ router.put('/:id', async (req: AuthRequest, res) => {
 // Delete an item
 router.delete('/:id', async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const userId = req.userId!;
 
     const result = await db

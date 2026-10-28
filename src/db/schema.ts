@@ -5,7 +5,7 @@ export const users = pgTable('users', {
   id: varchar('id', { length: 255 }).primaryKey(),
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
-  createdAt: timestamp('created_at', { mode: 'date', timezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
 // Items table - physical files/folders/boxes tracked by users
@@ -19,7 +19,7 @@ export const items = pgTable('items', {
   location: text('location').notNull(),
   category: varchar('category', { length: 50 }), // Personal, Work, Financial, Medical, Legal, Education, Other
   notes: text('notes'),
-  dateAdded: timestamp('date_added', { mode: 'date', timezone: true }).notNull(),
-  createdAt: timestamp('created_at', { mode: 'date', timezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date', timezone: true }).defaultNow().notNull(),
+  dateAdded: timestamp('date_added', { mode: 'date' }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
